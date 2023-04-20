@@ -37,3 +37,6 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" -y
 sudo apt-cache policy docker-ce
 sudo apt install docker-ce
+## Chrome
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo dpkg --install google-chrome-stable_current_amd64.deb

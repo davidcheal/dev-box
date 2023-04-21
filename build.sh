@@ -14,11 +14,24 @@ printer () {
 }
 
 cd ~/Downloads
+touch phase1
 # Update Ubunutu and install apt software
 printer INFO "Running Ubuntu upgrade"
 sudo apt-get update
 sudo apt-get upgrade -y
+# Reboot before release upgrade
+
+if [ ! -f  phase2]; then
+    touch phase2
+    printer FAIL "Rebooting for phase 2"
+    sudo shutdown -r +1
+fi
 sudo do-release-upgrade -f DistUpgradeViewNonInteractive
+if [ ! -f  phase3]; then
+    touch phase4
+    printer FAIL "Rebooting for phase 3"
+    sudo shutdown -r +1
+fi
 printer INFO "Installing apt applications"
 sudo apt-get install net-tools php-fpm git nmap curl rar p7zip-full p7zip-rar vlc ffpmeg terminator libfuse2 \
     open-vm-tools-desktop open-vm-tools openvpn \

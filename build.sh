@@ -71,7 +71,7 @@ if [ ! -f  phase3 ]; then
     tar -xf postman-linux-x64.tar.gz
     # Copy Config
     ## Terminator
-    cp terminator-config /home/dev/.config/terminator/config
+    cp terminator-config ~/.config/terminator/config
     cp profile ~/.profile
     echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >> ~/.bashrc
     touch phase3

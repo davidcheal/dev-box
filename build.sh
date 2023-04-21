@@ -32,9 +32,10 @@ fi
 if [ ! -f  phase3 ]; then
     touch phase3
     printer INFO "Installing apt applications"
-    sudo apt-get install net-tools php-fpm git nmap curl rar p7zip-full p7zip-rar vlc ffpmeg terminator libfuse2 \
+    sudo apt-get install net-tools php-fpm git nmap curl rar p7zip-full p7zip-rar vlc terminator libfuse2 \
         open-vm-tools-desktop open-vm-tools openvpn \
         -y
+    sudo snap install ffmpeg
     sudo apt remove unattended-upgrades -y
     sudo apt-get autoremove -y
     # Install apps

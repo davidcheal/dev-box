@@ -13,7 +13,6 @@ printer () {
  printf "${!level}$2${RESETCOLOR}\n"
 }
 
-cd ~/Downloads
 printer INFO "Starting build"
 if [ ! -f  phase1 ]; then
     printer INFO "Running Ubuntu upgrade"
@@ -64,10 +63,10 @@ if [ ! -f  phase3 ]; then
     sudo apt-cache policy docker-ce
     sudo apt install docker-ce -y
     ## Chrome
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    wget -O google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg --install google-chrome-stable_current_amd64.deb
     ## Postman
-    wget https://dl.pstmn.io/download/latest/linux_64
+    wget -O postman-linux-x64.tar.gz https://dl.pstmn.io/download/latest/linux_64
     tar -xf postman-linux-x64.tar.gz
     # Copy Config
     ## Terminator

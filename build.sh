@@ -16,20 +16,21 @@ printer () {
 cd ~/Downloads
 printer INFO "Starting build"
 if [ ! -f  phase1 ]; then
-    touch phase1
-    # Update Ubunutu and install apt software
     printer INFO "Running Ubuntu upgrade"
+    touch phase1
     sudo apt-get update
     sudo apt-get dist-upgrade -y
     sudo shutdown -r +1
-    # Reboot before release upgrade
+else
+    printer INFO "Skipping Ubuntu upgrade"
 fi
 if [ ! -f  phase2 ]; then
-    touch phase2
     printer INFO "Doing release upgrade"
+    touch phase2
     sudo do-release-upgrade -f DistUpgradeViewNonInteractive
+else
+    printer INFO "Skipping release upgrade"
 fi
-
 if [ ! -f  phase3 ]; then
     touch phase3
     printer INFO "Installing apt applications"
@@ -74,4 +75,6 @@ if [ ! -f  phase3 ]; then
     cp terminator-config /home/dev/.config/terminator/config
     cp profile ~/.profile
     echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >> ~/.bashrc
+else
+    printer INFO "Skipping apt applications"
 fi

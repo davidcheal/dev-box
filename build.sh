@@ -25,7 +25,8 @@ else
 fi
 if [ ! -f  phase2 ]; then
     printer INFO "Doing release upgrade"
-    sudo do-release-upgrade -f DistUpgradeViewNonInteractive
+    sudo do-release-upgrade 
+    # -f DistUpgradeViewNonInteractive
     touch phase2
 else
     printer INFO "Skipping release upgrade"

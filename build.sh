@@ -18,7 +18,7 @@ touch phase1
 # Update Ubunutu and install apt software
 printer INFO "Running Ubuntu upgrade"
 sudo apt-get update
-sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
 # Reboot before release upgrade
 
 if [ ! -f  phase2 ]; then

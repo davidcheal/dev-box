@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 FAIL="\e[31m"
 SUCCESS="\e[32m"
 WARN="\e[33m"
@@ -16,12 +18,11 @@ cd ~/Downloads
 printer INFO "Running Ubuntu upgrade"
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo do-release-upgrade -y
+sudo do-release-upgrade -f DistUpgradeViewNonInteractive
 printer INFO "Installing apt applications"
 sudo apt-get install net-tools php-fpm git nmap curl rar p7zip-full p7zip-rar vlc ffpmeg terminator libfuse2 \
     open-vm-tools-desktop open-vm-tools openvpn \
     -y
-printer INFO "Removing guff"
 sudo apt remove unattended-upgrades -y
 sudo apt-get autoremove -y
 # Install apps

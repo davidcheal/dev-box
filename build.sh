@@ -14,6 +14,7 @@ printer () {
 }
 
 cd ~/Downloads
+printer INFO "Starting build"
 if [ ! -f  phase1 ]; then
     touch phase1
     # Update Ubunutu and install apt software

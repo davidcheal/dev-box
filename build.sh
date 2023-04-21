@@ -21,13 +21,13 @@ sudo apt-get update
 sudo apt-get upgrade -y
 # Reboot before release upgrade
 
-if [ ! -f  phase2]; then
+if [ ! -f  phase2 ]; then
     touch phase2
     printer FAIL "Rebooting for phase 2"
     sudo shutdown -r +1
 fi
 sudo do-release-upgrade -f DistUpgradeViewNonInteractive
-if [ ! -f  phase3]; then
+if [ ! -f  phase3 ]; then
     touch phase4
     printer FAIL "Rebooting for phase 3"
     sudo shutdown -r +1

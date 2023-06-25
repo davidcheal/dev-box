@@ -7,6 +7,8 @@ SUCCESS="\e[32m"
 WARN="\e[33m"
 RESETCOLOR="\e[0m"
 INFO="\e[37m"
+EMAIL=david.cheal@gmail.com
+NAME="David Cheal"
 
 printer () {
  level=$1
@@ -35,15 +37,26 @@ if [ ! -f  phase3 ]; then
     mkdir ~/apps
     printer INFO "Installing apt applications"
     APPS=~/apps
+    # Packages
+    ## APT
     sudo apt-get install net-tools php-fpm git nmap curl rar \
         p7zip-full p7zip-rar vlc terminator libfuse2 \
         open-vm-tools-desktop open-vm-tools openvpn \
         kompare krusader trash-cli krename qbittorent \
-        filezilla libreoffice-calc
+        filezilla libreoffice-calc postman qBittorent \
+        krename kompare ruby-full python3-pip
         -y
-    sudo snap install ffmpeg
     sudo apt remove unattended-upgrades -y
     sudo apt-get autoremove -y
+    ## Config Git
+    git config --global user.email "you@example.com"
+    git config --global user.name "Your Name"
+    ## naconda 
+    ## PIP
+    curl https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh -o /tmp/anaconda.sh
+    bash /tmp/anaconda.sh -p
+    ## SNAP
+    sudo snap install ffmpeg   
     # Install apps
     ## KDENlive video editor
     printer INFO "Installing KDENlive"
@@ -76,17 +89,17 @@ if [ ! -f  phase3 ]; then
     wget -O temp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg --install temp/google-chrome-stable_current_amd64.deb
     ## Postman
-    wget -O temp/postman-linux-x64.tar.gz https://dl.pstmn.io/download/latest/linux_64
-    mkdir $APPS/postman
-    tar -xf temp/postman-linux-x64.tar.gz -C ~/apps/postman
+    
     ## Tor
     wget -O temp/tor-browser-linux64-12.0.5_ALL.tar.xz https://www.torproject.org/dist/torbrowser/12.0.5/tor-browser-linux64-12.0.5_ALL.tar.xz
     tar -xf temp/tor-browser-linux64-12.0.5_ALL.tar.xz -C ~/apps/
-    # Copy Config
+    # Copy Configs
     ## Terminator
     mkdir ~/.config/terminator
-    cp terminator-config ~/.config/terminator/config
-    cp profile ~/.profile
+    cp assets/terminator-config ~/.config/terminator/config
+    ## Profile
+    cp assets/profile ~/.profile
+    cp assets/bashrc ~/.bashrc
     ## Set shell prompt
     echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >> ~/.bashrc
     # Clean up

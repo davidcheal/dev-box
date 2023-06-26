@@ -123,7 +123,7 @@ if [[ ! -f phase3 ]]; then
         wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
         bash $TMP/anaconda.sh
     fi
-    bash $TMP/anaconda.sh -p
+    bash $TMP/anaconda.sh -bf
 
     ## AWS CLI
     printer INFO "Installing AWS CLI"

@@ -76,6 +76,7 @@ if [[ ! -f phase3 ]]; then
 
     # Linux Only
     if [[ $OS == 'linux' ]]; then
+
         # Distro based apps
         ## APT
         sudo apt-get install net-tools git nmap curl rar \
@@ -87,23 +88,27 @@ if [[ ! -f phase3 ]]; then
         sudo apt remove unattended-upgrades -y
         sudo apt-get autoremove -y
         export BOX=$(sudo dmidecode -s system-manufacturer)
-        if [[ $BOX =~ VMware ]]; then
+        if [[ $BOX =~ VMware ]]; then # Install vmware tool if on a vmware host
             sudo apt-get install open-vm-tools-desktop open-vm-tools
         fi
         ## SNAPs
-        sudo snap install ffmpeg
-        sudo snap install postman
+        if [[ ! $(which ffmpeg) ]]; then sudo snap install ffmpeg; fi
+        if [[ ! $(which ffmpeg) ]]; then sudo snap install postman; fi
         ## KDENlive video editor
         printer INFO "Installing KDENlive"
-        wget -O $LINUX_APP_FOLDER/kdenlive https://download.kde.org/stable/kdenlive/22.12/linux/kdenlive-22.12.3-x86_64.AppImage --show-progress
-        chmod +x $LINUX_APP_FOLDER/kdenlive
+        if [[ ! -f $LINUX_APP_FOLDER/kdenlive ]]; then
+            wget -O $LINUX_APP_FOLDER/kdenlive https://download.kde.org/stable/kdenlive/22.12/linux/kdenlive-22.12.3-x86_64.AppImage --show-progress
+            chmod +x $LINUX_APP_FOLDER/kdenlive
+        fi
     fi
 
     # MacOS Only
     if [[ $OS == 'macos' ]]; then
         ## Install xcode
-        printer INFO "Installing xCode"
-        xcode-select --install
+        # if [[ ! $(which xcode) ]]; then
+        #     printer INFO "Installing xCode, this will take a long time!"
+        #     xcode-select --install
+        # fi
         ## Install Homebrew
         printer INFO "Installing Homebrew"
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -116,80 +121,90 @@ if [[ ! -f phase3 ]]; then
     # MacOS and Ubuntu
     ## Anaconda
     printer INFO "Installing Anaconda"
-    if [[ $OS == 'linux' ]]; then
-        wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
-        bash $TMP/anaconda.sh
-    else
-        wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
-        bash $TMP/anaconda.sh
+    if [[ ! $(which anaconda) ]]; then
+        if [[ $OS == 'linux' ]]; then
+            wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
+            bash $TMP/anaconda.sh
+        else
+            wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-MacOSX-x86_64.sh --show-progress
+            bash $TMP/anaconda.sh
+        fi
+        bash $TMP/anaconda.sh -bf
     fi
-    bash $TMP/anaconda.sh -bf
 
     ## AWS CLI
     printer INFO "Installing AWS CLI"
-    if [[ $OS == 'linux' ]]; then
-        wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" --show-progress
-        unzip awscliv2.zip temp/
-        sudo .$TMP/aws/install
-        aws -v
-    else
-        pip3 install awscli --upgrade --user
-        aws -v
+    if [[ ! $(which aws) ]]; then
+        if [[ $OS == 'linux' ]]; then
+            wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" --show-progress
+            unzip awscliv2.zip temp/
+            sudo .$TMP/aws/install
+            aws -v
+        else
+            pip3 install awscli --upgrade --user
+            aws -v
+        fi
     fi
 
     ## VSCode
-    printer INFO "Installing VSCode"
-    if [[ $OS == 'linux' ]]; then
-        sudo snap install --classic code
-    else
-        brew install --cask visual-studio-code
-    fi
+    if [[ ! $(which code) ]]; then
+        printer INFO "Installing VSCode"
+        if [[ $OS == 'linux' ]]; then
+            sudo snap install --classic code
+        else
+            brew install --cask visual-studio-code
+        fi
 
-    ## VSCode Extensions
-    vscode --install-extension amazonwebservices.aws-toolkit-vscode
-    vscode --install-extension Codeium.codeium
-    vscode --install-extension cshum.convert-newline-list-to-array
-    vscode --install-extension dbaeumer.vscode-eslint
-    vscode --install-extension eamodio.gitlens
-    vscode --install-extension esbenp.prettier-vscode
-    vscode --install-extension janisdd.vscode-edit-csv
-    vscode --install-extension jmviz.quote-list
-    vscode --install-extension mechatroner.rainbow-csv
-    vscode --install-extension ms-azuretools.vscode-docker
-    vscode --install-extension ms-python.python
-    vscode --install-extension ms-python.vscode-pylance
-    vscode --install-extension petli-full.json-to-yaml-and-more
-    vscode --install-extension shd101wyy.markdown-preview-enhanced
-    vscode --install-extension streetsidesoftware.code-spell-checker
-    vscode --install-extension Tyriar.sort-lines
-    vscode --install-extension wmaurer.change-case
+        ## VSCode Extensions
+        code --install-extension amazonwebservices.aws-toolkit-vscode
+        code --install-extension Codeium.codeium
+        code --install-extension cshum.convert-newline-list-to-array
+        code --install-extension dbaeumer.vscode-eslint
+        code --install-extension eamodio.gitlens
+        code --install-extension esbenp.prettier-vscode
+        code --install-extension janisdd.vscode-edit-csv
+        code --install-extension jmviz.quote-list
+        code --install-extension mechatroner.rainbow-csv
+        code --install-extension ms-azuretools.vscode-docker
+        code --install-extension ms-python.python
+        code --install-extension ms-python.vscode-pylance
+        code --install-extension petli-full.json-to-yaml-and-more
+        code --install-extension shd101wyy.markdown-preview-enhanced
+        code --install-extension streetsidesoftware.code-spell-checker
+        code --install-extension Tyriar.sort-lines
+        code --install-extension wmaurer.change-case
+    fi
 
     ## Node Version Manager, npm and Node
     printer INFO "Install Node Version Manager and NPM LTS"
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-    nvm install --lts
-
-    ## Global NPM Packages
-    npm install -g npm-check-updates create-react-app express-generator
-    node -v
-    npm -v
+    if [[! $(which node) ]]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        nvm install --lts
+        ## Global NPM Packages
+        npm install -g npm-check-updates create-react-app express-generator
+        node -v
+        npm -v
+    fi
 
     ## Docker
-    printer INFO "Installing Docker"
-    if [[ $OS == 'linux' ]]; then
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" -y
-        sudo apt-cache policy docker-ce
-        sudo apt-get update
-        sudo apt install docker-ce -y
-    else
-        brew install docker
+    if [[ ! $(which docker) ]]; then
+        printer INFO "Installing Docker"
+        if [[ $OS == 'linux' ]]; then
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" -y
+            sudo apt-cache policy docker-ce
+            sudo apt-get update
+            sudo apt install docker-ce -y
+        else
+            brew install docker
+        fi
     fi
 
     ## Chrome
+
     if [[ $OS == 'linux' ]]; then
         wget -O $TMP/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --show-progress
         sudo dpkg --install $TMKP/chrome.deb

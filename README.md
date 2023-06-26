@@ -12,6 +12,24 @@ This script will install all the applications to create a new devloper environme
 ## IDE
 
 - VS Code
+  - Extensions
+  - amazonwebservices.aws-toolkit-vscode
+  - Codeium.codeium
+  - cshum.convert-newline-list-to-array
+  - dbaeumer.vscode-eslint
+  - eamodio.gitlens
+  - esbenp.prettier-vscode
+  - janisdd.vscode-edit-csv
+  - jmviz.quote-list
+  - mechatroner.rainbow-csv
+  - ms-azuretools.vscode-docker
+  - ms-python.python
+  - ms-python.vscode-pylance
+  - petli-full.json-to-yaml-and-more
+  - shd101wyy.markdown-preview-enhanced
+  - streetsidesoftware.code-spell-checker
+  - Tyriar.sort-lines
+  - wmaurer.change-case
 - BlueBird (ubuntu only)
 - Anaconda AI/ML IDE
 

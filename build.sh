@@ -2,21 +2,21 @@
 
 set -e
 
-FAIL="\e[31m"
+CRIT="\e[31m"
 SUCCESS="\e[32m"
 WARN="\e[33m"
 RESETCOLOR="\e[0m"
 INFO="\e[37m"
 
-EMAIL=david.cheal@gmail.com
-NAME="David Cheal"
-
-LINUX_APP_FOLDER=~/apps
-
 printer() {
     level=$1
     printf "${!level}$2${RESETCOLOR}\n"
 }
+
+EMAIL=david.cheal@gmail.com #default
+NAME="David Cheal"          #default
+
+LINUX_APP_FOLDER=~/apps
 
 # Detect Ubuntu or MacOs
 if [[ $OSTYPE =~ ^linux ]]; then
@@ -28,14 +28,20 @@ elif [[ $OSTYPE =~ ^darwin ]]; then
     export PROJECT_DIR=~/projects
     export TMP=/tmp/build
 else
-    printer ERROR "OS doesnt match anything this script can help with."
+    printer CRIT "OS doesnt match anything this script can help with."
     exit 1
 fi
 
-printer ERROR "This will install a lot of apps and makes not effort to not overwrite existing versions and configs"
-read -p "Are you sure? y/n" -n 1 -r
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    printer INFO "\nInstall cancelled"
+read -p "What is your email address?: " -r
+EMAIL=$REPLY
+read -p "What is your name?: " -r
+NAME=$REPLY
+
+printer CRIT "This will install a lot of apps. NO effort ias made to preserve existing versions and configs"
+
+read -p "Are you sure you want to continue? Press y or n" -n 1 -r -s
+if [[ $REPLY =~ ^[Nn]$ ]]; then
+    printer SUCCESS "\nInstall cancelled"
     exit 0
 fi
 
@@ -51,40 +57,43 @@ fi
 printer INFO "Starting build"
 
 if [[ ! -f phase1 ]]; then
-    printer INFO "Running upgrade"
-    sudo apt-get update
-    sudo apt-get dist-upgrade -y
-    touch phase1
-    # TODO: Reboot should not be requird, needs to be validated
-    # sudo shutdown -r +1
+    if [[ $OS == 'linux' ]]; then
+        printer INFO "Running apt update/upgrade"
+        sudo apt-get update
+        sudo apt-get dist-upgrade -y
+        touch phase1
+        # TODO: Reboot should not be requird, needs to be validated
+        # sudo shutdown -r +1
+    fi
 else
-    printer INFO "Phase 1 already complete. Skipping"
+    printer SUCCESS "Phase 1 already complete. Skipping"
 fi
 
 if [[ ! -f phase2 ]]; then
+    printer INFO "Upgrading Ubuntu"
     # if [[ $OS == 'linux' ]]; then
     #     printer INFO "Doing release upgrade"
     #     # sudo do-release-upgrade -q DistUpgradeViewNonInteractive 2>/dev/null || true
     # fi
     touch phase2
 else
-    printer INFO "Phase 2 already complete. Skipping"
+    printer SUCCESS "Phase 2 already complete. Skipping"
 fi
 
 if [[ ! -f phase3 ]]; then
-    printer INFO "Installing apt applications"
-
+    printer INFO "Installing applications"
     # Linux Only
     if [[ $OS == 'linux' ]]; then
-
         # Distro based apps
         ## APT
+
         sudo apt-get install net-tools git nmap curl rar \
             p7zip-full p7zip-rar vlc terminator libfuse2 \
             openvpn kompare krusader trash-cli krename \
             qbittorrent filezilla libreoffice-calc \
             krename kompare ruby-full python3-pip \
-            dmidecode firefox php-fpm nginx -y
+            dmidecode firefox php-fpm nginx default-jre default-jdk \
+            golang-go -y
         sudo apt remove unattended-upgrades -y
         sudo apt-get autoremove -y
         export BOX=$(sudo dmidecode -s system-manufacturer)
@@ -95,8 +104,9 @@ if [[ ! -f phase3 ]]; then
         if [[ ! $(which ffmpeg) ]]; then sudo snap install ffmpeg; fi
         if [[ ! $(which ffmpeg) ]]; then sudo snap install postman; fi
         ## KDENlive video editor
-        printer INFO "Installing KDENlive"
+
         if [[ ! -f $LINUX_APP_FOLDER/kdenlive ]]; then
+            printer INFO "Installing KDENlive"
             wget -O $LINUX_APP_FOLDER/kdenlive https://download.kde.org/stable/kdenlive/22.12/linux/kdenlive-22.12.3-x86_64.AppImage --show-progress
             chmod +x $LINUX_APP_FOLDER/kdenlive
         fi
@@ -115,13 +125,16 @@ if [[ ! -f phase3 ]]; then
         brew update
         ## Install brew apps
         printer INFO "Installing Brew apps"
-        brew install curl php vlc filezilla ruby python postman openvpn-connect zip sevenzip rar wget nginx xtorrent
+        brew install curl php vlc filezilla ruby python postman \
+            openvpn-connect zip sevenzip rar wget nginx xtorrent \
+            java go
+        brew install --cask firefox
     fi
 
     # MacOS and Ubuntu
     ## Anaconda
-    printer INFO "Installing Anaconda"
     if [[ ! $(which anaconda) ]]; then
+        printer INFO "Installing Anaconda"
         if [[ $OS == 'linux' ]]; then
             wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
             bash $TMP/anaconda.sh
@@ -133,8 +146,8 @@ if [[ ! -f phase3 ]]; then
     fi
 
     ## AWS CLI
-    printer INFO "Installing AWS CLI"
     if [[ ! $(which aws) ]]; then
+        printer INFO "Installing AWS CLI"
         if [[ $OS == 'linux' ]]; then
             wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" --show-progress
             unzip awscliv2.zip temp/
@@ -176,8 +189,8 @@ if [[ ! -f phase3 ]]; then
     fi
 
     ## Node Version Manager, npm and Node
-    printer INFO "Install Node Version Manager and NPM LTS"
-    if [[! $(which node) ]]; then
+    if [[ ! $(which node) ]]; then
+        printer INFO "Install Node Version Manager and NPM LTS"
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -185,8 +198,6 @@ if [[ ! -f phase3 ]]; then
         nvm install --lts
         ## Global NPM Packages
         npm install -g npm-check-updates create-react-app express-generator
-        node -v
-        npm -v
     fi
 
     ## Docker
@@ -204,11 +215,14 @@ if [[ ! -f phase3 ]]; then
     fi
 
     ## Chrome
-
     if [[ $OS == 'linux' ]]; then
-        wget -O $TMP/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --show-progress
-        sudo dpkg --install $TMKP/chrome.deb
+        if [[ ! $(which google-chrome) ]]; then
+            printer INFO "Installing Chrome"
+            wget -O $TMP/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --show-progress
+            sudo dpkg --install $TMP/chrome.deb
+        fi
     else
+        printer INFO "Installing Chrome"
         wget -O https://dl.google.com/dl/chrome/mac/universal/stable/gcea/googlechrome.dmg --show-progress
         hdiutil attach $TMP/chrome.dmg -nobrowse
         cp -pPR /Volumes/Google Chrome/Google Chrome.app /Applications/
@@ -218,28 +232,37 @@ if [[ ! -f phase3 ]]; then
 
     ## Tor
     if [[ $OS == 'linux' ]]; then
-        wget -O $TMP/tor.tar.xz https://www.torproject.org/dist/torbrowser/12.0.5/tor-browser-linux64-12.0.5_ALL.tar.xz --show-progress
-        tar -xf $TMP/tor.tar.xz -C $LINUX_APP_FOLDER
+        if [[ ! -f $LINUX_APP_FOLDER/tor/tor ]]; then
+            wget -O $TMP/tor.tar.xz https://dist.torproject.org/torbrowser/12.5/tor-expert-bundle-12.5-linux-x86_64.tar.gz --show-progress
+            tar -xf $TMP/tor.tar.xz -C $LINUX_APP_FOLDER
+        fi
     else
         brew install tor
     fi
 
+    # Creating SSH keys for use with git
+    if [[ ! -f ~/.ssh/$EMAIL ]]; then
+        printer INFO "Generating ssh keypair for use with git"
+        ssh-keygen -t rsa -N '' -f ~/.ssh/$EMAIL <<<y
+    fi
+
     # Config Apps
     ## Config Git
-    git config --global user.email $EMAIL
-    git config --global user.name $NAME
+    printer INFO "Updatng app configs."
+    git config --global --replace-all user.email "$EMAIL"
+    git config --global --replace-all user.name "$NAME"
 
     ## Terminator
     if [[ $OS == 'linux' ]]; then
-        mkdir ~/.config/terminator
-        cp assets/terminator-config ~/.config/terminator/config
+        if [[ ! -d ~/.config/terminator ]]; then
+            mkdir ~/.config/terminator
+            cp assets/terminator-config ~/.config/terminator/config/terminator-config
+        fi
+        cp ~/.profile ~/.profile.old
+        cp assets/bashrc ~/.bashrc.old
+        cp assets/profile ~/.profile
+        cp assets/bashrc ~/.bashrc
     fi
-
-    ## Profile
-    cp ~/.profile ~/.profile.old
-    cp assets/bashrc ~/.bashrc.old
-    cp assets/profile ~/.profile
-    cp assets/bashrc ~/.bashrc
 
     ## Set shell prompt
     if [[ $OS == 'linux' ]]; then
@@ -251,6 +274,17 @@ if [[ ! -f phase3 ]]; then
     # Clean up
     rm $TMP -r
     touch phase3
+    printer SUCCESS "DevBox build complete."
 else
-    printer INFO "Skipping apt applications"
+    printer SUCCESS "Phase 3 already complete."
 fi
+printer INFO "Node:"
+node --version
+printer INFO "npm:"
+npm --version
+printer INFO "Java:"
+java --version
+printer INFO "Python:"
+python3 --version
+printer INFO "PHP:"
+php --version

@@ -8,11 +8,12 @@ This script will install all the applications to create a new devloper environme
 - Ruby
 - NodeJS / npm
 - xcode (Mac Only)
+- Java
 
 ## IDE
 
 - VS Code
-  - Extensions
+  Extensions
   - amazonwebservices.aws-toolkit-vscode
   - Codeium.codeium
   - cshum.convert-newline-list-to-array

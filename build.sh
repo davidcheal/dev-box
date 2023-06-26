@@ -33,13 +33,20 @@ else
 fi
 
 read -p "What is your email address?: " -r
-EMAIL=$REPLY
+if [[ ! -z $REPLY ]]; then
+    EMAIL=$REPLY
+fi
+
 read -p "What is your name?: " -r
-NAME=$REPLY
+if [[ ! -z $REPLY ]]; then
+    NAME=$REPLY
+fi
 
 printer CRIT "This will install a lot of apps. NO effort ias made to preserve existing versions and configs"
 
 read -p "Are you sure you want to continue? Press y or n" -n 1 -r -s
+printf "\n"
+
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     printer SUCCESS "\nInstall cancelled"
     exit 0
@@ -85,15 +92,13 @@ if [[ ! -f phase3 ]]; then
     # Linux Only
     if [[ $OS == 'linux' ]]; then
         # Distro based apps
-        ## APT
-
         sudo apt-get install net-tools git nmap curl rar \
             p7zip-full p7zip-rar vlc terminator libfuse2 \
             openvpn kompare krusader trash-cli krename \
             qbittorrent filezilla libreoffice-calc \
             krename kompare ruby-full python3-pip \
             dmidecode firefox php-fpm nginx default-jre default-jdk \
-            golang-go -y
+            golang-go dotnet-sdk-7.0 aspnetcore-runtime-7.0 -y
         sudo apt remove unattended-upgrades -y
         sudo apt-get autoremove -y
         export BOX=$(sudo dmidecode -s system-manufacturer)
@@ -136,13 +141,18 @@ if [[ ! -f phase3 ]]; then
     if [[ ! $(which anaconda) ]]; then
         printer INFO "Installing Anaconda"
         if [[ $OS == 'linux' ]]; then
+            if [[ -d /home/developer/anaconda3 ]]; then
+                sudo rm /home/developer/anaconda3 -R
+            fi
             wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
-            bash $TMP/anaconda.sh
         else
+            if [[ -d /home/developer/anaconda3 ]]; then
+                rm -R /home/developer/anaconda3
+            fi
             wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-MacOSX-x86_64.sh --show-progress
-            bash $TMP/anaconda.sh
         fi
         bash $TMP/anaconda.sh -bf
+        echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >>~/.bashrc
     fi
 
     ## AWS CLI
@@ -276,7 +286,7 @@ if [[ ! -f phase3 ]]; then
     fi
 
     # Clean up
-    rm $TMP -r
+    #rm $TMP -r
     touch phase3
     printer SUCCESS "DevBox build complete."
 else

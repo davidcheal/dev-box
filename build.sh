@@ -150,7 +150,7 @@ if [[ ! -f phase3 ]]; then
         printer INFO "Installing AWS CLI"
         if [[ $OS == 'linux' ]]; then
             wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" --show-progress
-            unzip awscliv2.zip temp/
+            unzip awscliv2.zip $TMP
             sudo .$TMP/aws/install
             aws -v
         else
@@ -186,6 +186,7 @@ if [[ ! -f phase3 ]]; then
         code --install-extension streetsidesoftware.code-spell-checker
         code --install-extension Tyriar.sort-lines
         code --install-extension wmaurer.change-case
+        code --install-extension foxundermoon.shell-format
     fi
 
     ## Node Version Manager, npm and Node

@@ -35,7 +35,7 @@ fi
 printer ERROR "This will install a lot of apps and makes not effort to not overwrite existing versions and configs"
 read -p "Are you sure? y/n" -n 1 -r
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    printer INFO "Install cancelled"
+    printer INFO "\nInstall cancelled"
     exit 0
 fi
 
@@ -45,7 +45,7 @@ fi
 
 # Setup Linux
 if [[ $OS == 'linux' ]]; then
-    mkdir $LINUX_APP_FOLDER
+    [ ! -d $LINUX_APP_FOLDER ] && mkdir $LINUX_APP_FOLDER
 fi
 
 printer INFO "Starting build"
@@ -61,9 +61,11 @@ else
     printer INFO "Phase 1 already complete. Skipping"
 fi
 
-if [[ $OS -eq 'linux' ]] && [[ ! -f phase2 ]]; then
-    printer INFO "Doing release upgrade"
-    sudo do-release-upgrade -f DistUpgradeViewNonInteractive
+if [[ ! -f phase2 ]]; then
+    # if [[ $OS == 'linux' ]]; then
+    #     printer INFO "Doing release upgrade"
+    #     # sudo do-release-upgrade -q DistUpgradeViewNonInteractive 2>/dev/null || true
+    # fi
     touch phase2
 else
     printer INFO "Phase 2 already complete. Skipping"
@@ -73,16 +75,15 @@ if [[ ! -f phase3 ]]; then
     printer INFO "Installing apt applications"
 
     # Linux Only
-    if [[ $OS -eq 'linux' ]]; then
+    if [[ $OS == 'linux' ]]; then
         # Distro based apps
         ## APT
         sudo apt-get install net-tools git nmap curl rar \
             p7zip-full p7zip-rar vlc terminator libfuse2 \
             openvpn kompare krusader trash-cli krename \
-            qbittorent filezilla libreoffice-calc postman \
-            qBittorent krename kompare ruby-full python3-pip \
-            dmidecode firefox
-        -y
+            qbittorrent filezilla libreoffice-calc \
+            krename kompare ruby-full python3-pip \
+            dmidecode firefox php-fpm nginx -y
         sudo apt remove unattended-upgrades -y
         sudo apt-get autoremove -y
         export BOX=$(sudo dmidecode -s system-manufacturer)
@@ -91,40 +92,43 @@ if [[ ! -f phase3 ]]; then
         fi
         ## SNAPs
         sudo snap install ffmpeg
+        sudo snap install postman
         ## KDENlive video editor
         printer INFO "Installing KDENlive"
-        wget -O $LINUX_APP_FOLDER/kdenlive https://download.kde.org/stable/kdenlive/22.12/linux/kdenlive-22.12.3-x86_64.AppImage
+        wget -O $LINUX_APP_FOLDER/kdenlive https://download.kde.org/stable/kdenlive/22.12/linux/kdenlive-22.12.3-x86_64.AppImage --show-progress
         chmod +x $LINUX_APP_FOLDER/kdenlive
     fi
 
     # MacOS Only
-    if [[ $OS -eq 'macos' ]]; then
+    if [[ $OS == 'macos' ]]; then
         ## Install xcode
+        printer INFO "Installing xCode"
         xcode-select --install
         ## Install Homebrew
+        printer INFO "Installing Homebrew"
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew update
         ## Install brew apps
-        brew install curl php vlc filezilla ruby python postman openvpn-connect zip sevenzip rar wget
-        brew install --cask xtorrent
+        printer INFO "Installing Brew apps"
+        brew install curl php vlc filezilla ruby python postman openvpn-connect zip sevenzip rar wget nginx xtorrent
     fi
 
     # MacOS and Ubuntu
     ## Anaconda
-    if [[ $OS -eq 'linux' ]]; then
-        wget -o $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh
+    printer INFO "Installing Anaconda"
+    if [[ $OS == 'linux' ]]; then
+        wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
         bash $TMP/anaconda.sh
     else
-        wget -o $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh
+        wget -O $TMP/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.03-1-Linux-x86_64.sh --show-progress
         bash $TMP/anaconda.sh
     fi
     bash $TMP/anaconda.sh -p
-    # PHP
-    php-fpm
+
     ## AWS CLI
     printer INFO "Installing AWS CLI"
-    if [[ $OS -eq 'linux' ]]; then
-        wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+    if [[ $OS == 'linux' ]]; then
+        wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" --show-progress
         unzip awscliv2.zip temp/
         sudo .$TMP/aws/install
         aws -v
@@ -135,7 +139,7 @@ if [[ ! -f phase3 ]]; then
 
     ## VSCode
     printer INFO "Installing VSCode"
-    if [[ $OS -eq 'linux' ]]; then
+    if [[ $OS == 'linux' ]]; then
         sudo snap install --classic code
     else
         brew install --cask visual-studio-code
@@ -175,7 +179,7 @@ if [[ ! -f phase3 ]]; then
 
     ## Docker
     printer INFO "Installing Docker"
-    if [[ $OS -eq 'linux' ]]; then
+    if [[ $OS == 'linux' ]]; then
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" -y
         sudo apt-cache policy docker-ce
@@ -186,11 +190,11 @@ if [[ ! -f phase3 ]]; then
     fi
 
     ## Chrome
-    if [[ $OS -eq 'linux' ]]; then
-        wget -O $TMP/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    if [[ $OS == 'linux' ]]; then
+        wget -O $TMP/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb --show-progress
         sudo dpkg --install $TMKP/chrome.deb
     else
-        wget -o https://dl.google.com/dl/chrome/mac/universal/stable/gcea/googlechrome.dmg
+        wget -O https://dl.google.com/dl/chrome/mac/universal/stable/gcea/googlechrome.dmg --show-progress
         hdiutil attach $TMP/chrome.dmg -nobrowse
         cp -pPR /Volumes/Google Chrome/Google Chrome.app /Applications/
         GoogleChromeDMG="$(hdiutil info | grep "/Volumes/Google Chrome" | awk '{ print $1 }')"
@@ -198,8 +202,8 @@ if [[ ! -f phase3 ]]; then
     fi
 
     ## Tor
-    if [[ $OS -eq 'linux' ]]; then
-        wget -O $TMP/tor.tar.xz https://www.torproject.org/dist/torbrowser/12.0.5/tor-browser-linux64-12.0.5_ALL.tar.xz
+    if [[ $OS == 'linux' ]]; then
+        wget -O $TMP/tor.tar.xz https://www.torproject.org/dist/torbrowser/12.0.5/tor-browser-linux64-12.0.5_ALL.tar.xz --show-progress
         tar -xf $TMP/tor.tar.xz -C $LINUX_APP_FOLDER
     else
         brew install tor
@@ -211,7 +215,7 @@ if [[ ! -f phase3 ]]; then
     git config --global user.name $NAME
 
     ## Terminator
-    if [[ $OS -eq 'linux' ]]; then
+    if [[ $OS == 'linux' ]]; then
         mkdir ~/.config/terminator
         cp assets/terminator-config ~/.config/terminator/config
     fi
@@ -223,7 +227,7 @@ if [[ ! -f phase3 ]]; then
     cp assets/bashrc ~/.bashrc
 
     ## Set shell prompt
-    if [[ $OS -eq 'linux' ]]; then
+    if [[ $OS == 'linux' ]]; then
         echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >>~/.bashrc
     else
         echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >>~/.bashrc

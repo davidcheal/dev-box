@@ -259,10 +259,13 @@ if [[ ! -f phase3 ]]; then
             mkdir ~/.config/terminator
             cp assets/terminator-config ~/.config/terminator/config/terminator-config
         fi
+        # Backup
         cp ~/.profile ~/.profile.old
         cp assets/bashrc ~/.bashrc.old
+        # Copy
         cp assets/profile ~/.profile
         cp assets/bashrc ~/.bashrc
+        cp assets/vscode ~/.config/Code/User/settings.json
     fi
 
     ## Set shell prompt

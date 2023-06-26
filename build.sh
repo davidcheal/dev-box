@@ -302,3 +302,5 @@ printer INFO "Python:"
 python3 --version
 printer INFO "PHP:"
 php --version
+printer INFO ".Net"
+dotnet --version

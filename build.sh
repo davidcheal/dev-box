@@ -91,16 +91,19 @@ if [[ ! -f phase3 ]]; then
     # Linux Only
     if [[ $OS == 'linux' ]]; then
         # Distro based apps
-	# Update pat sources for MS apps	
-	sudo apt-get install -y gpg
-	wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
-	sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
-	wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
-	sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
-	sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
-	sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
-	sudo apt-get update
-#apt install
+        ## Remove guff
+        sudo apt-get remove thunderbird -y
+        sudo apt-get remove --purge libreoffice* -y
+        # Update pat sources for MS apps	
+        sudo apt-get install -y gpg
+        wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+        sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+        wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
+        sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+        sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+        sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+        sudo apt-get update
+        #apt install
         sudo apt-get install net-tools git nmap curl rar \
             p7zip-full p7zip-rar vlc terminator libfuse2 \
             openvpn kompare krusader trash-cli krename \
@@ -177,6 +180,16 @@ if [[ ! -f phase3 ]]; then
         fi
     fi
 
+    ## Authy
+    if [[ ! $(which authy) ]]; then
+        printer INFO "Installing Authy"
+        if [[ $OS == 'linux' ]]; then
+            sudo snap install authy
+        else
+            pip3 install awscli --upgrade --user
+        fi
+    fi
+
     ## VSCode
     if [[ ! $(which code) ]]; then
         printer INFO "Installing VSCode"
@@ -201,7 +214,7 @@ if [[ ! -f phase3 ]]; then
         code --install-extension ms-python.vscode-pylance
         code --install-extension petli-full.json-to-yaml-and-more
         code --install-extension shd101wyy.markdown-preview-enhanced
-        # code --install-extension streetsidesoftware.code-spell-checker
+        code --install-extension streetsidesoftware.code-spell-checker
         code --install-extension Tyriar.sort-lines
         code --install-extension wmaurer.change-case
         code --install-extension foxundermoon.shell-format
@@ -271,11 +284,13 @@ if [[ ! -f phase3 ]]; then
     git config --global --replace-all user.email "$EMAIL"
     git config --global --replace-all user.name "$NAME"
 
+    ## Templates
+    cp assets/templates/* ~/Templates -r
     ## Terminator
     if [[ $OS == 'linux' ]]; then
         if [[ ! -d ~/.config/terminator ]]; then
             mkdir ~/.config/terminator
-            cp assets/terminator-config ~/.config/terminator/config/terminator-config
+            cp assets/terminator ~/.config/terminator/config/terminator-config
         fi
         # Backup
         cp ~/.profile ~/.profile.old

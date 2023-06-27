@@ -86,12 +86,21 @@ if [[ ! -f phase2 ]]; then
 else
     printer SUCCESS "Phase 2 already complete. Skipping"
 fi
-
 if [[ ! -f phase3 ]]; then
     printer INFO "Installing applications"
     # Linux Only
     if [[ $OS == 'linux' ]]; then
         # Distro based apps
+	# Update pat sources for MS apps	
+	sudo apt-get install -y gpg
+	wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
+	sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
+	wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list
+	sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
+	sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
+	sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
+	sudo apt-get update
+#apt install
         sudo apt-get install net-tools git nmap curl rar \
             p7zip-full p7zip-rar vlc terminator libfuse2 \
             openvpn kompare krusader trash-cli krename \
@@ -153,6 +162,7 @@ if [[ ! -f phase3 ]]; then
         fi
         bash $TMP/anaconda.sh -bf
         echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >>~/.bashrc
+	export PATH="$HOME/anaconda3/bin:$PATH"
     fi
 
     ## AWS CLI
@@ -160,12 +170,10 @@ if [[ ! -f phase3 ]]; then
         printer INFO "Installing AWS CLI"
         if [[ $OS == 'linux' ]]; then
             wget -O $TMP/awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" --show-progress
-            unzip awscliv2.zip $TMP
-            sudo .$TMP/aws/install
-            aws -v
+            unzip $TMP/awscliv2.zip -d $TMP
+            sudo bash $TMP/aws/install
         else
             pip3 install awscli --upgrade --user
-            aws -v
         fi
     fi
 
@@ -193,7 +201,7 @@ if [[ ! -f phase3 ]]; then
         code --install-extension ms-python.vscode-pylance
         code --install-extension petli-full.json-to-yaml-and-more
         code --install-extension shd101wyy.markdown-preview-enhanced
-        code --install-extension streetsidesoftware.code-spell-checker
+        # code --install-extension streetsidesoftware.code-spell-checker
         code --install-extension Tyriar.sort-lines
         code --install-extension wmaurer.change-case
         code --install-extension foxundermoon.shell-format
@@ -244,7 +252,7 @@ if [[ ! -f phase3 ]]; then
     ## Tor
     if [[ $OS == 'linux' ]]; then
         if [[ ! -f $LINUX_APP_FOLDER/tor/tor ]]; then
-            wget -O $TMP/tor.tar.xz https://dist.torproject.org/torbrowser/12.5/tor-expert-bundle-12.5-linux-x86_64.tar.gz --show-progress
+            wget -O $TMP/tor.tar.xz https://www.torproject.org/dist/torbrowser/12.5/tor-browser-linux64-12.5_ALL.tar.xz --show-progress
             tar -xf $TMP/tor.tar.xz -C $LINUX_APP_FOLDER
         fi
     else
@@ -288,6 +296,7 @@ if [[ ! -f phase3 ]]; then
     # Clean up
     #rm $TMP -r
     touch phase3
+	source ~/.bashrc
     printer SUCCESS "DevBox build complete."
 else
     printer SUCCESS "Phase 3 already complete."
@@ -304,3 +313,5 @@ printer INFO "PHP:"
 php --version
 printer INFO ".Net"
 dotnet --version
+printer INFO "AWS CLI"
+aws --version

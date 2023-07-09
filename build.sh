@@ -94,7 +94,7 @@ if [[ ! -f phase3 ]]; then
         ## Remove guff
         sudo apt-get remove thunderbird -y
         sudo apt-get remove --purge libreoffice* -y
-        # Update pat sources for MS apps	
+        # Update pat sources for MS apps
         sudo apt-get install -y gpg
         wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
         sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
@@ -108,7 +108,7 @@ if [[ ! -f phase3 ]]; then
             p7zip-full p7zip-rar vlc terminator libfuse2 \
             openvpn kompare krusader trash-cli krename \
             qbittorrent filezilla libreoffice-calc \
-            krename kompare ruby-full python3-pip \
+            krename kompare ruby-full python3-pip jq \
             dmidecode firefox php-fpm nginx default-jre default-jdk \
             golang-go dotnet-sdk-7.0 aspnetcore-runtime-7.0 -y
         sudo apt remove unattended-upgrades -y
@@ -119,7 +119,7 @@ if [[ ! -f phase3 ]]; then
         fi
         ## SNAPs
         if [[ ! $(which ffmpeg) ]]; then sudo snap install ffmpeg; fi
-        if [[ ! $(which ffmpeg) ]]; then sudo snap install postman; fi
+        if [[ ! $(which postman) ]]; then sudo snap install postman; fi
         ## KDENlive video editor
 
         if [[ ! -f $LINUX_APP_FOLDER/kdenlive ]]; then
@@ -138,11 +138,11 @@ if [[ ! -f phase3 ]]; then
         # fi
         ## Install Homebrew
         printer INFO "Installing Homebrew"
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew update
         ## Install brew apps
         printer INFO "Installing Brew apps"
-        brew install curl php vlc filezilla ruby python postman \
+        brew install curl php vlc ruby python postman \
             openvpn-connect zip sevenzip rar wget nginx xtorrent \
             java go
         brew install --cask firefox
@@ -165,7 +165,7 @@ if [[ ! -f phase3 ]]; then
         fi
         bash $TMP/anaconda.sh -bf
         echo 'export PATH="$HOME/anaconda3/bin:$PATH"' >>~/.bashrc
-	export PATH="$HOME/anaconda3/bin:$PATH"
+        export PATH="$HOME/anaconda3/bin:$PATH"
     fi
 
     ## AWS CLI
@@ -283,14 +283,17 @@ if [[ ! -f phase3 ]]; then
     printer INFO "Updatng app configs."
     git config --global --replace-all user.email "$EMAIL"
     git config --global --replace-all user.name "$NAME"
-
+    if [[ $OS == 'linux' ]]; then
+	cp assets/Postman.desktop /usr/share/applications/Postman.desktop
+        gsettings get org.gnome.desktop.lockdown disable-lock-screen
+        dconf write /org/gnome/shell/favorite-apps "['google-chrome.desktop', 'firefox.desktop','code_code.desktop', 'terminator.desktop', 'Postman.desktop','org.kde.krusader.desktop']"
+    fi
     ## Templates
     cp assets/templates/* ~/Templates -r
-    ## Terminator
     if [[ $OS == 'linux' ]]; then
         if [[ ! -d ~/.config/terminator ]]; then
-            mkdir ~/.config/terminator
-            cp assets/terminator ~/.config/terminator/config/terminator-config
+            mkdir -p ~/.config/terminator
+            cp assets/terminator ~/.config/terminator/config
         fi
         # Backup
         cp ~/.profile ~/.profile.old
@@ -301,18 +304,12 @@ if [[ ! -f phase3 ]]; then
         cp assets/vscode ~/.config/Code/User/settings.json
     fi
 
-    ## Set shell prompt
-    if [[ $OS == 'linux' ]]; then
-        echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >>~/.bashrc
-    else
-        echo "export PS1='\[\033[1;32m\]$(whoami)@\[\033[1;34m\]$(hostname):\[\033[33m\]$(pwd)\[\033[0;37m\]\[\e[91m\]$(parse_git_branch)\[\e[00m\]\n'" >>~/.bashrc
-    fi
-
     # Clean up
     #rm $TMP -r
-    touch phase3
-	source ~/.bashrc
+
+    source ~/.bashrc
     printer SUCCESS "DevBox build complete."
+    touch phase3
 else
     printer SUCCESS "Phase 3 already complete."
 fi

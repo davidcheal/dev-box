@@ -1,10 +1,13 @@
 [global_config]
-  smart_copy = False
+  title_transmit_bg_color = "#cc0000"
+  title_inactive_bg_color = "#babdb6"
 [keybindings]
+  copy = <Primary>c
   paste = <Primary>v
 [profiles]
   [[default]]
-    cursor_color = "#aaaaaa"
+    cursor_color = "#8ae234"
+    cursor_color_fg = False
     scrollback_infinite = True
     copy_on_selection = True
 [layouts]
@@ -15,5 +18,4 @@
     [[[child1]]]
       type = Terminal
       parent = window0
-      profile = default
 [plugins]

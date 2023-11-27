@@ -30,8 +30,7 @@ LINUX_COMMANDS = [
     "wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list",
     "sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list",
     "curl -fsSL https://packages.openvpn.net/packages-repo.gpg | sudo tee /etc/apt/keyrings/openvpn.asc",
-    "export DISTRO=$(lsb_release -c | awk '{print $2}')",
-    "echo deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian $DISTRO main | sudo tee /etc/apt/sources.list.d/openvpn-packages.list",
+    "echo deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main | sudo tee /etc/apt/sources.list.d/openvpn-packages.list",
     "sudo apt-get update",
     "sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg",
     "sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list",
@@ -129,16 +128,15 @@ def install_linux_packages(packages):
         sys.exit(1)
 
 def linux_configure():
-    if not os.path.isfile(os.path.expanduser(f"{HOME}.config/terminator")):
+    if not os.path.exists(os.path.expanduser(f"{HOME}.config/terminator")):
         os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))
         shutil.copyfile('./assets/terminator', f"{HOME}.config/terminator/config/terminator-config")
-    if not os.path.isfile(os.path.expanduser('{HOME}.ssh/known_hosts')):
+    if not os.path.isfile(os.path.expanduser(f"{HOME}.ssh/known_hosts")):
         subprocess.check_call(f"ssh-keygen -t rsa -N '' -f {HOME}.ssh/{EMAIL} <<<y", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
-    shutil.copyfile("{HOME}.profile", f"{HOME}.profile.old")
+    shutil.copyfile(f"{HOME}.profile", f"{HOME}.profile.old")
     shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc.old")
     shutil.copyfile("./assets/profile", f"{HOME}.profile")
     shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc")
-    shutil.copyfile("./assets/vscode", f"{HOME}.config/Code/User/settings.json")
     subprocess.check_call(f"git config --global --replace-all user.email {EMAIL}", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
     subprocess.check_call(f"git config --global --replace-all user.name {NAME}", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
 

@@ -6,6 +6,7 @@ import subprocess
 from getpass import getpass
 import sys
 import re
+import shutil
 
 CRIT = "\033[31m"
 SUCCESS = "\033[32m"
@@ -13,15 +14,12 @@ WARN = "\033[33m"
 RESET = "\033[0m"
 INFO = "\033[37m"
 
-# DEfaults
+# Defaults
 EMAIL = "david.cheal@gmail.com"  # default
 NAME = "David Cheal"  # default
 BOX_TYPE = "devbox"  # default
 LINUX_APP_FOLDER = os.path.expanduser("~/apps")
 VMWARE = False
-
-LINUX_APT = "sudo apt-get install -y"
-MACOS_BREW = "brew install -y",
 
 LINUX_COMMANDS = [
     "sudo apt-get update",
@@ -29,23 +27,18 @@ LINUX_COMMANDS = [
     "sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/",
     "wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list",
     "sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list",
+    "curl -fsSL https://packages.openvpn.net/packages-repo.gpg | sudo tee /etc/apt/keyrings/openvpn.asc",
+    "export DISTRO=$(lsb_release -c | awk '{print $2}')",
+    "echo deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian $DISTRO main | sudo tee /etc/apt/sources.list.d/openvpn-packages.list",
+    "sudo apt-get update",
     "sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg",
     "sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list",
     "sudo apt-get remove thunderbird -y",
     "sudo apt-get remove --purge libreoffice* -y",
+    "sudo apt-get upgrade -y",
     "sudo apt remove unattended-upgrades -y",
-    "sudo apt-get autoremove -y",
-    "sudo apt-get upgrade -y"
+    "sudo apt-get autoremove -y"
 ]
-
-def linux_commands(LINUX_COMMANDS):
-    try:
-        for COMMAND in LINUX_COMMANDS:
-            subprocess.check_call(COMMAND, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
-            printer(SUCCESS, COMMAND + " successful")
-    except subprocess.CalledProcessError:
-        printer(CRIT, COMMAND + " failed")
-        sys.exit(1)
 
 LINUX_BASE_APPS = [
     {"name":"Curl", "package_name":"curl", "options":None, "installer":"apt"},
@@ -89,7 +82,6 @@ LINUX_DEV_APPS = [
 def printer(color, text):
     print(f"{color}{text}{RESET}")
 
-
 # Detect VMWARE
 DMI_CODE = subprocess.check_output("sudo dmidecode -s system-manufacturer", shell=True)
 
@@ -107,6 +99,15 @@ elif "darwin" in platform.system().lower():
 else:
     printer(CRIT, "OS doesn't match anything this script can help with.")
     sys.exit(1)
+
+def linux_commands(LINUX_COMMANDS):
+    try:
+        for COMMAND in LINUX_COMMANDS:
+            subprocess.check_call(COMMAND, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+            printer(SUCCESS, COMMAND + " successful")
+    except subprocess.CalledProcessError:
+        printer(CRIT, COMMAND + " failed")
+        sys.exit(1)
 
 def install_linux_packages(packages):
     try:
@@ -127,6 +128,17 @@ def install_linux_packages(packages):
         printer(CRIT, APP["name"] + " installation failed")
         sys.exit(1)
 
+def linux_configure():
+    if not os.path.isfile('~/.config/terminator'):
+        os.mkdir('~/.config/terminator')
+        shutil.copyfile('./assets/terminator', '~/.config/terminator/config/terminator-config')
+    shutil.copyfile('~/.profile', '~/.profile.old')
+    shutil.copyfile('./assets/bashrc', '~/.bashrc.old')
+    shutil.copyfile('./assets/profile', '~/.profile')
+    shutil.copyfile('./assets/bashrc', '~/.bashrc')
+    shutil.copyfile('./assets/vscode', '~/.config/Code/User/settings.json')
+
+# Get user input
 BOX_TYPE = input(f"What box type?: minimal or [{BOX_TYPE}] ") or BOX_TYPE
 EMAIL = input(f"What is your email address?: [{EMAIL}]") or EMAIL
 NAME = input(f"What is your name?: [{NAME}]") or NAME
@@ -134,6 +146,7 @@ NAME = input(f"What is your name?: [{NAME}]") or NAME
 
 
 linux_commands(LINUX_COMMANDS)
+linux_configure()
 install_linux_packages(LINUX_BASE_APPS)
 install_linux_packages(LINUX_DEV_APPS)
 

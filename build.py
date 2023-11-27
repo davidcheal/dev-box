@@ -76,8 +76,8 @@ LINUX_DEV_APPS = [
     {"name":"Open VPN", "package_name":"openvpn-connect", "options":None,"installer":"apt"},
     {"name":"PHP FPM", "package_name":"php-fpm", "options":None,"installer":"apt"},
     {"name":"Ruby", "package_name":"ruby-full", "options":None,"installer":"apt"},
-    {"name":"PyCharm Professional", "package_name":"pycharm-professional --classic", "options":None},
-    {"name":"Postman", "package_name":"postman", "options":None}
+    {"name":"Postman", "package_name":"postman", "options":None,"installer":"snap"}
+    {"name":"VSCode", "package_name":"--classic code", "options":None,"installer":"snap"}
 ]
 
 def printer(color, text):
@@ -112,7 +112,7 @@ def install_linux_packages(packages):
     try:
         for APP in packages:
             INSTALLED = False
-            if subprocess.call(f"which {APP['package_name']}, shell=True") == 0:
+            if subprocess.call(f"which {APP['package_name']}", shell=True) == 0:
                 INSTALLED = True
             if not INSTALLED:
                 printer(INFO, f"Installing {APP['name']}")

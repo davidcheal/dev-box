@@ -79,7 +79,7 @@ LINUX_DEV_APPS = [
     {"name":"GoLang", "package_name":"golang-go", "options":None,"installer":"apt"},
     {"name":"NGINX", "package_name":"nginx", "options":None,"installer":"apt"},
     {"name":"NMap", "package_name":"nmap", "options":None,"installer":"apt"},
-    {"name":"Open VPN", "package_name":"Open VPN", "options":None,"installer":"apt"},
+    {"name":"Open VPN", "package_name":"openvpn-connect", "options":None,"installer":"apt"},
     {"name":"PHP FPM", "package_name":"php-fpm", "options":None,"installer":"apt"},
     {"name":"Ruby", "package_name":"ruby-full", "options":None,"installer":"apt"},
     {"name":"PyCharm Professional", "package_name":"pycharm-professional --classic", "options":None},
@@ -116,7 +116,10 @@ def install_linux_packages(packages):
                 INSTALLED = True
             if not INSTALLED:
                 printer(INFO, "Installing "+APP["name"])
-                subprocess.check_call("sudo apt-get install -y " + APP["package_name"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+                if(APP["installer"] == "apt"):
+                    subprocess.check_call("sudo apt-get install -y " + APP["package_name"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+                else:
+                    subprocess.check_call("snap install -y " + APP["package_name"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
                 printer(SUCCESS, APP["name"] + " installation successful")
             else:
                 printer(INFO, APP["name"] + "already installed")

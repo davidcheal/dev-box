@@ -100,7 +100,7 @@ LINUX_BASE_APPS = [
         "package_name": "krusader",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "krusader",
     },
     {
         "name": "Libre Office Calc",
@@ -128,7 +128,7 @@ LINUX_BASE_APPS = [
         "package_name": "p7zip-rar",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "p7zip",
     },
     {
         "name": "Python 3 PIP",
@@ -201,7 +201,7 @@ LINUX_DEV_APPS = [
         "package_name": "default-jdk",
         "options": None,
         "installer": "apt",
-        "which": False,
+        "which": "javac",
     },
     {
         "name": "Java JRE",
@@ -292,7 +292,17 @@ else:
     sys.exit(1)
 
 
+def install_chrome():
+    if OS == "linux":
+        subprocess.check_call(
+            "wget https: // dl.google.com / linux / direct / google - chrome - stable_current_amd64.deb",
+            shell=True,
+        )
+
+
 def linux_commands(commands):
+    if OS != "linux":
+        return
     for command in commands:
         try:
             subprocess.check_call(
@@ -305,6 +315,8 @@ def linux_commands(commands):
 
 
 def install_linux_packages(packages):
+    if OS != "linux":
+        return
     for APP in packages:
         try:
             installed = False
@@ -332,6 +344,8 @@ def install_linux_packages(packages):
 
 
 def linux_configure():
+    if OS != "linux":
+        return
     if not os.path.exists(os.path.expanduser(f"{HOME}.config/terminator")):
         os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))
         shutil.copyfile(
@@ -369,5 +383,6 @@ NAME = input(f"What is your name?: [{NAME}]") or NAME
 
 linux_commands(LINUX_COMMANDS)
 linux_configure()
+install_chrome()
 install_linux_packages(LINUX_BASE_APPS)
 install_linux_packages(LINUX_DEV_APPS)

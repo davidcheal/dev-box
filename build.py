@@ -73,7 +73,7 @@ LINUX_DEV_APPS = [
     {"name":"GoLang", "package_name":"golang-go", "options":None,"installer":"apt"},
     {"name":"NGINX", "package_name":"nginx", "options":None,"installer":"apt"},
     {"name":"NMap", "package_name":"nmap", "options":None,"installer":"apt"},
-    {"name":"Open VPN", "package_name":"openvpn-connect", "options":None,"installer":"apt"},
+    {"name":"Open VPN", "package_name":"openvpn3", "options":None,"installer":"apt"},
     {"name":"PHP FPM", "package_name":"php-fpm", "options":None,"installer":"apt"},
     {"name":"Ruby", "package_name":"ruby-full", "options":None,"installer":"apt"},
     {"name":"Postman", "package_name":"postman", "options":None,"installer":"snap"}

@@ -33,11 +33,11 @@ LINUX_COMMANDS = [
     "sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/",
     "wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list",
     "sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list",
+    "sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg",
+    "sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list",
     "curl -fsSL https://packages.openvpn.net/packages-repo.gpg | sudo tee /etc/apt/keyrings/openvpn.asc",
     "echo deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main | sudo tee /etc/apt/sources.list.d/openvpn-packages.list",
     "sudo apt-get update",
-    "sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg",
-    "sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list",
     "sudo apt-get remove thunderbird -y",
     "sudo apt-get remove --purge libreoffice* -y",
     "sudo apt-get upgrade -y",
@@ -295,7 +295,7 @@ else:
 def install_chrome():
     if OS == "linux":
         subprocess.check_call(
-            "wget https: // dl.google.com / linux / direct / google - chrome - stable_current_amd64.deb",
+            "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb",
             shell=True,
         )
 

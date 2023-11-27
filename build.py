@@ -76,7 +76,7 @@ LINUX_DEV_APPS = [
     {"name":"Open VPN", "package_name":"openvpn3", "options":None,"installer":"apt"},
     {"name":"PHP FPM", "package_name":"php-fpm", "options":None,"installer":"apt"},
     {"name":"Ruby", "package_name":"ruby-full", "options":None,"installer":"apt"},
-    {"name":"Postman", "package_name":"postman", "options":None,"installer":"snap"}
+    {"name":"Postman", "package_name":"postman", "options":None,"installer":"snap"},
     {"name":"VSCode", "package_name":"--classic code", "options":None,"installer":"snap"}
 ]
 

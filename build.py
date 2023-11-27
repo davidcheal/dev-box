@@ -113,34 +113,34 @@ def install_linux_packages(packages):
     try:
         for APP in packages:
             INSTALLED = False
-            if subprocess.call("which " + APP["package_name"], shell=True) == 0:
+            if subprocess.call(f"which {APP['package_name']}, shell=True") == 0:
                 INSTALLED = True
             if not INSTALLED:
-                printer(INFO, "Installing "+APP["name"])
+                printer(INFO, f"Installing {APP['name']}")
                 if(APP["installer"] == "apt"):
                     subprocess.check_call("sudo apt-get install -y " + APP["package_name"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
                 else:
-                    subprocess.check_call("snap install -y " + APP["package_name"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
-                printer(SUCCESS, APP["name"] + " installation successful")
+                    subprocess.check_call(f"snap install -y {APP['package_name']}, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True")
+                printer(SUCCESS, f"{APP['name']} installation successful")
             else:
                 printer(INFO, APP["name"] + "already installed")
     except subprocess.CalledProcessError:
-        printer(CRIT, APP["name"] + " installation failed")
+        printer(CRIT, f"{APP['name']} installation failed")
         sys.exit(1)
 
 def linux_configure():
-    if not os.path.isfile(os.path.expanduser('{HOME}.config/terminator')):
-        os.mkdir(os.path.expanduser('{HOME}.config/terminator'))
-        shutil.copyfile('./assets/terminator', '{HOME}.config/terminator/config/terminator-config')
+    if not os.path.isfile(os.path.expanduser(f"{HOME}.config/terminator")):
+        os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))
+        shutil.copyfile('./assets/terminator', f"{HOME}.config/terminator/config/terminator-config")
     if not os.path.isfile(os.path.expanduser('{HOME}.ssh/known_hosts')):
-        subprocess.check_call("ssh-keygen -t rsa -N '' -f {HOME}.ssh/{EMAIL} <<<y", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
-    shutil.copyfile('{HOME}.profile', '{HOME}.profile.old')
-    shutil.copyfile('./assets/bashrc', '{HOME}.bashrc.old')
-    shutil.copyfile('./assets/profile', '{HOME}.profile')
-    shutil.copyfile('./assets/bashrc', '{HOME}.bashrc')
-    shutil.copyfile('./assets/vscode', '{HOME}.config/Code/User/settings.json')
-    subprocess.check_call('git config --global --replace-all user.email {EMAIL}', stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
-    subprocess.check_call('git config --global --replace-all user.name {NAME}', stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+        subprocess.check_call(f"ssh-keygen -t rsa -N '' -f {HOME}.ssh/{EMAIL} <<<y", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+    shutil.copyfile("{HOME}.profile", f"{HOME}.profile.old")
+    shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc.old")
+    shutil.copyfile("./assets/profile", f"{HOME}.profile")
+    shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc")
+    shutil.copyfile("./assets/vscode", f"{HOME}.config/Code/User/settings.json")
+    subprocess.check_call(f"git config --global --replace-all user.email {EMAIL}", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+    subprocess.check_call(f"git config --global --replace-all user.name {NAME}", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
 
 # Get user input
 BOX_TYPE = input(f"What box type?: minimal or [{BOX_TYPE}] ") or BOX_TYPE

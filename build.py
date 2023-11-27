@@ -18,8 +18,10 @@ INFO = "\033[37m"
 EMAIL = "david.cheal@gmail.com"  # default
 NAME = "David Cheal"  # default
 BOX_TYPE = "devbox"  # default
-LINUX_APP_FOLDER = os.path.expanduser("~/apps")
 VMWARE = False
+LINUX_APP_FOLDER = os.path.expanduser("~/apps")
+HOME=os.path.expanduser('~/')
+PROJECT_DIR = os.path.expanduser("~/projects")
 
 LINUX_COMMANDS = [
     "sudo apt-get update",
@@ -90,11 +92,9 @@ if re.match("VMware", str(DMI_CODE,encoding='utf-8')):
 # Detect Ubuntu or MacOs
 if "linux" in platform.system().lower():
     OS = "linux"
-    PROJECT_DIR = os.path.expanduser("~/projects")
     TMP = "/tmp/build"
 elif "darwin" in platform.system().lower():
     OS = "macos"
-    PROJECT_DIR = os.path.expanduser("~/projects")
     TMP = "/tmp/build"
 else:
     printer(CRIT, "OS doesn't match anything this script can help with.")
@@ -129,14 +129,18 @@ def install_linux_packages(packages):
         sys.exit(1)
 
 def linux_configure():
-    if not os.path.isfile('~/.config/terminator'):
-        os.mkdir('~/.config/terminator')
+    if not os.path.isfile(os.path.expanduser('~/.config/terminator')):
+        os.mkdir(os.path.expanduser('~/.config/terminator'))
         shutil.copyfile('./assets/terminator', '~/.config/terminator/config/terminator-config')
-    shutil.copyfile('~/.profile', '~/.profile.old')
-    shutil.copyfile('./assets/bashrc', '~/.bashrc.old')
-    shutil.copyfile('./assets/profile', '~/.profile')
-    shutil.copyfile('./assets/bashrc', '~/.bashrc')
-    shutil.copyfile('./assets/vscode', '~/.config/Code/User/settings.json')
+    if not os.path.isfile(os.path.expanduser('~/.ssh/known_hosts')):
+        subprocess.check_call("ssh-keygen -t rsa -N '' -f ~/.ssh/{EMAIL} <<<y", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+    shutil.copyfile('{HOME}.profile', '{HOME}.profile.old')
+    shutil.copyfile('./assets/bashrc', '{HOME}.bashrc.old')
+    shutil.copyfile('./assets/profile', '{HOME}.profile')
+    shutil.copyfile('./assets/bashrc', '{HOME}.bashrc')
+    shutil.copyfile('./assets/vscode', '{HOME}.config/Code/User/settings.json')
+    subprocess.check_call('git config --global --replace-all user.email {EMAIL}', stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+    subprocess.check_call('git config --global --replace-all user.name {NAME}', stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
 
 # Get user input
 BOX_TYPE = input(f"What box type?: minimal or [{BOX_TYPE}] ") or BOX_TYPE

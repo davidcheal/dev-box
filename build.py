@@ -129,11 +129,11 @@ def install_linux_packages(packages):
         sys.exit(1)
 
 def linux_configure():
-    if not os.path.isfile(os.path.expanduser('~/.config/terminator')):
-        os.mkdir(os.path.expanduser('~/.config/terminator'))
-        shutil.copyfile('./assets/terminator', '~/.config/terminator/config/terminator-config')
-    if not os.path.isfile(os.path.expanduser('~/.ssh/known_hosts')):
-        subprocess.check_call("ssh-keygen -t rsa -N '' -f ~/.ssh/{EMAIL} <<<y", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
+    if not os.path.isfile(os.path.expanduser('{HOME}.config/terminator')):
+        os.mkdir(os.path.expanduser('{HOME}.config/terminator'))
+        shutil.copyfile('./assets/terminator', '{HOME}.config/terminator/config/terminator-config')
+    if not os.path.isfile(os.path.expanduser('{HOME}.ssh/known_hosts')):
+        subprocess.check_call("ssh-keygen -t rsa -N '' -f {HOME}.ssh/{EMAIL} <<<y", stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
     shutil.copyfile('{HOME}.profile', '{HOME}.profile.old')
     shutil.copyfile('./assets/bashrc', '{HOME}.bashrc.old')
     shutil.copyfile('./assets/profile', '{HOME}.profile')

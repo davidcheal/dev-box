@@ -301,6 +301,11 @@ else:
 
 def install_chrome():
     if OS == "linux":
+        if subprocess.check_call(
+                "which chrome",
+                shell=True,
+        ) == 0:
+            return
         subprocess.check_call(
             "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/build/chrome.deb",
             shell=True,

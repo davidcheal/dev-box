@@ -58,42 +58,42 @@ LINUX_BASE_APPS = [
         "package_name": "dmidecode",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "dmidecode",
     },
     {
         "name": "Firefox",
         "package_name": "firefox",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "firefox",
     },
     {
         "name": "GPG",
         "package_name": "gpg",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "gpg",
     },
     {
         "name": "JQ",
         "package_name": "jq",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "jq",
     },
     {
         "name": "Kompare",
         "package_name": "kompare",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "kompare",
     },
     {
         "name": "K Rename",
         "package_name": "krename",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "krename",
     },
     {
         "name": "Krusader",
@@ -107,21 +107,21 @@ LINUX_BASE_APPS = [
         "package_name": "libreoffice-calc",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "libreoffice --calc",
     },
     {
         "name": "Network Tools",
         "package_name": "net-tools",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": False,
     },
     {
         "name": "P7 Zip",
         "package_name": "p7zip-full",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "p7zip",
     },
     {
         "name": "P7 RAR",
@@ -135,49 +135,49 @@ LINUX_BASE_APPS = [
         "package_name": "python3-pip",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "pip",
     },
     {
         "name": "Qbittorrent",
         "package_name": "qbittorrent",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "qbittorrent",
     },
     {
         "name": "Rar",
         "package_name": "rar",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "rar",
     },
     {
         "name": "Terminator",
         "package_name": "terminator",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "terminator",
     },
     {
         "name": "Trash CLI",
         "package_name": "trash-cli",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "trash",
     },
     {
         "name": "VLC Player",
         "package_name": "vlc",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "vlc",
     },
     {
         "name": "FF Mpeg",
         "package_name": "ffmpeg",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "ffmpeg",
     },
 ]
 
@@ -187,98 +187,91 @@ LINUX_DEV_APPS = [
         "package_name": "aspnetcore-runtime-7.0",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "dotnet",
     },
     {
         "name": ".Net Core SDK",
         "package_name": "dotnet-sdk-7.0",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "dotnet",
     },
     {
         "name": "Java JDK",
         "package_name": "default-jdk",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": False,
     },
     {
         "name": "Java JRE",
         "package_name": "default-jre",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "java",
     },
     {
         "name": "FileZilla",
         "package_name": "filezilla",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "filezilla",
     },
     {
         "name": "GoLang",
         "package_name": "golang-go",
         "options": None,
         "installer": "apt",
-        "which": "",
-    },
-    {
-        "name": "GoLang",
-        "package_name": "golang-go",
-        "options": None,
-        "installer": "apt",
-        "which": "",
+        "which": "go",
     },
     {
         "name": "NGINX",
         "package_name": "nginx",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "nginx",
     },
     {
         "name": "NMap",
         "package_name": "nmap",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "nmap",
     },
     {
         "name": "Open VPN",
         "package_name": "openvpn3",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "openvpn3",
     },
     {
         "name": "PHP FPM",
         "package_name": "php-fpm",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "php",
     },
     {
         "name": "Ruby",
         "package_name": "ruby-full",
         "options": None,
         "installer": "apt",
-        "which": "",
+        "which": "ruby",
     },
     {
         "name": "Postman",
         "package_name": "postman",
         "options": None,
         "installer": "snap",
-        "which": "",
+        "which": "postman",
     },
     {
         "name": "VSCode",
-        "package_name": "--classic code",
-        "options": None,
+        "package_name": "code",
+        "options": "--classic",
         "installer": "snap",
-        "which": "",
+        "which": "code",
     },
 ]
 
@@ -312,10 +305,10 @@ def linux_commands(commands):
 
 
 def install_linux_packages(packages):
-    try:
-        for APP in packages:
+    for APP in packages:
+        try:
             installed = False
-            if subprocess.call(f"which {APP['package_name']}", shell=True) == 0:
+            if subprocess.call(f"which {APP['which']}", shell=True) == 0:
                 installed = True
             if not installed:
                 printer(INFO, f"Installing {APP['name']}")
@@ -328,14 +321,14 @@ def install_linux_packages(packages):
                     )
                 else:
                     subprocess.check_call(
-                        f"snap install -y {APP['package_name']}, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True"
+                        f"snap install {APP['package_name']} {APP['options']}, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True"
                     )
                 printer(SUCCESS, f"{APP['name']} installation successful")
             else:
                 printer(INFO, APP["name"] + "already installed")
-    except subprocess.CalledProcessError:
-        printer(CRIT, f"{APP['name']} installation failed")
-        sys.exit(1)
+        except subprocess.CalledProcessError:
+            printer(CRIT, f"{APP['name']} installation failed")
+            sys.exit(1)
 
 
 def linux_configure():

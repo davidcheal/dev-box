@@ -13,6 +13,8 @@ WARN = "\033[33m"
 RESET = "\033[0m"
 INFO = "\033[37m"
 
+OS_NAME = platform.system()
+
 
 def printer(color, text):
     print(f"{color}{text}{RESET}")
@@ -29,7 +31,7 @@ PROJECT_DIR = os.path.expanduser("~/projects")
 
 
 def create_build_loc():
-    if OS == "linux":
+    if OS_NAME == "Linux":
         if not os.path.exists("/tmp/build"):
             os.mkdir("/tmp/build")
 
@@ -288,23 +290,26 @@ DMI_CODE = subprocess.check_output("sudo dmidecode -s system-manufacturer", shel
 if re.match("VMware", str(DMI_CODE, encoding="utf-8")):
     VMWARE = True
 # Detect Ubuntu or MacOs
-if "linux" in platform.system().lower():
-    OS = "linux"
+if "Linux" in platform.system().lower():
+    OS_NAME = "Linux"
     TMP = "/tmp/build"
 elif "darwin" in platform.system().lower():
-    OS = "macos"
+    OS_NAME = "macos"
     TMP = "/tmp/build"
 else:
-    printer(CRIT, "OS doesn't match anything this script can help with.")
+    printer(CRIT, "OS_NAME doesn't match anything this script can help with.")
     sys.exit(1)
 
 
 def install_chrome():
-    if OS == "linux":
-        if subprocess.check_call(
-                "which chrome",
-                shell=True,
-        ) == 0:
+    if OS_NAME == "Linux":
+        if (
+                subprocess.call(
+                    "which chrome",
+                    shell=True,
+                )
+                == 1
+        ):
             return
         subprocess.check_call(
             "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/build/chrome.deb",
@@ -317,7 +322,7 @@ def install_chrome():
 
 
 def install_node():
-    if OS == "linux":
+    if OS_NAME == "Linux":
         if subprocess.call("which node", shell=True) == 0:
             subprocess.check_call(
                 " curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash",
@@ -328,10 +333,13 @@ def install_node():
                 "npm install -g npm-check-updates vite express-generator",
                 shell=True,
             )
+            printer(SUCCESS, "Node installation successful. Reboot before sue")
+        else:
+            printer(INFO, "Node Already installed")
 
 
 def linux_commands(commands):
-    if OS != "linux":
+    if OS_NAME != "Linux":
         return
     for command in commands:
         try:
@@ -345,7 +353,7 @@ def linux_commands(commands):
 
 
 def install_linux_packages(packages):
-    if OS != "linux":
+    if OS_NAME != "Linux":
         return
     for APP in packages:
         try:
@@ -367,14 +375,14 @@ def install_linux_packages(packages):
                     )
                 printer(SUCCESS, f"{APP['name']} installation successful")
             else:
-                printer(INFO, APP["name"] + "already installed")
+                printer(INFO, APP["name"] + " already installed")
         except subprocess.CalledProcessError:
             printer(CRIT, f"{APP['name']} installation failed")
             sys.exit(1)
 
 
 def linux_configure():
-    if OS != "linux":
+    if OS_NAME != "Linux":
         return
     if not os.path.exists(os.path.expanduser(f"{HOME}.config/terminator")):
         os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))

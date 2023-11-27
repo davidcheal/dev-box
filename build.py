@@ -27,6 +27,13 @@ LINUX_APP_FOLDER = os.path.expanduser("~/apps")
 HOME = os.path.expanduser("~/")
 PROJECT_DIR = os.path.expanduser("~/projects")
 
+
+def create_build_loc():
+    if OS == "linux":
+        if not os.path.exists("/tmp/build"):
+            os.mkdir("/tmp/build")
+
+
 LINUX_COMMANDS = [
     "sudo apt-get update",
     "wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg",
@@ -295,9 +302,27 @@ else:
 def install_chrome():
     if OS == "linux":
         subprocess.check_call(
-            "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb",
+            "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/build/chrome.deb",
             shell=True,
         )
+        subprocess.check_call(
+            "sudo dpkg -i /tmp/build/chrome.deb",
+            shell=True,
+        )
+
+
+def install_node():
+    if OS == "linux":
+        if subprocess.call("which node", shell=True) == 0:
+            subprocess.check_call(
+                " curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash",
+                shell=True,
+            )
+            subprocess.check_call("nvm install --lts", shell=True)
+            subprocess.check_call(
+                "npm install -g npm-check-updates vite express-generator",
+                shell=True,
+            )
 
 
 def linux_commands(commands):
@@ -381,6 +406,7 @@ BOX_TYPE = input(f"What box type?: minimal or [{BOX_TYPE}] ") or BOX_TYPE
 EMAIL = input(f"What is your email address?: [{EMAIL}]") or EMAIL
 NAME = input(f"What is your name?: [{NAME}]") or NAME
 
+create_build_loc()
 linux_commands(LINUX_COMMANDS)
 linux_configure()
 install_chrome()

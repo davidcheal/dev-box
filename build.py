@@ -381,13 +381,16 @@ def install_linux_packages(packages):
                     )
                 else:
                     subprocess.check_call(
-                        f"snap install {APP['package_name']} {xstr(APP['options'])}", stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT, shell=True)
+                        f"snap install {APP['package_name']} {xstr(APP['options'])}",
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.STDOUT,
+                        shell=True,
+                    )
                 printer(SUCCESS, f"{APP['name']} installation successful")
             else:
                 printer(INFO, APP["name"] + " already installed")
-        except subprocess.CalledProcessError:
-            printer(CRIT, f"{APP['name']} installation failed")
+        except subprocess.CalledProcessError as e:
+            printer(CRIT, f"{APP['name']} installation failed with: {e.output}")
             sys.exit(1)
 
 

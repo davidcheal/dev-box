@@ -44,6 +44,12 @@ def create_build_loc():
             os.mkdir("/tmp/build")
 
 
+def xstr(s):
+    if s is None:
+        return ""
+    return str(s)
+
+
 LINUX_COMMANDS = [
     "sudo apt-get update",
     "wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg",
@@ -145,7 +151,7 @@ LINUX_BASE_APPS = [
         "package_name": "p7zip-rar",
         "options": None,
         "installer": "apt",
-        "which": "p7zip",
+        "which": None,
     },
     {
         "name": "Python 3 PIP",
@@ -375,7 +381,7 @@ def install_linux_packages(packages):
                     )
                 else:
                     subprocess.check_call(
-                        f"snap install {APP['package_name']} {APP['options']}, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True"
+                        f"snap install {APP['package_name']} {xstr(APP['options'])}, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True"
                     )
                 printer(SUCCESS, f"{APP['name']} installation successful")
             else:

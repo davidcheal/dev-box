@@ -52,7 +52,7 @@ LINUX_COMMANDS = [
     "sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list",
     "sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg",
     "sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list",
-    "wget https://packages.openvpn.net/packages-repo.gpg -O /etc/apt/keyrings/openvpn.asc",
+    "sudo wget https://packages.openvpn.net/packages-repo.gpg -O /etc/apt/keyrings/openvpn.asc",
     "echo deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main | sudo tee /etc/apt/sources.list.d/openvpn-packages.list",
     "sudo apt-get update",
     "sudo apt-get remove thunderbird -y",
@@ -347,7 +347,7 @@ def linux_commands(commands):
             subprocess.check_call(
                 command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True
             )
-            printer(SUCCESS, command + " successful")
+            printer(SUCCESS, f"{command} successful")
         except subprocess.CalledProcessError as e:
             printer(
                 CRIT,

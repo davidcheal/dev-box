@@ -347,8 +347,8 @@ def linux_commands(commands):
                 command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True
             )
             printer(SUCCESS, command + " successful")
-        except subprocess.CalledProcessError:
-            printer(CRIT, command + " failed")
+        except subprocess.CalledProcessError as e:
+            printer(CRIT, f"{command} failed with: {e.output}")
             sys.exit(1)
 
 

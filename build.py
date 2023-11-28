@@ -35,6 +35,7 @@ VMWARE = False
 LINUX_APP_FOLDER = os.path.expanduser("~/apps")
 HOME = os.path.expanduser("~/")
 PROJECT_DIR = os.path.expanduser("~/projects")
+BUILD_DIRECTORY = "/tmp/build"
 
 
 def create_build_loc():
@@ -51,7 +52,7 @@ LINUX_COMMANDS = [
     "sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list",
     "sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg",
     "sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list",
-    "curl -fsSL https://packages.openvpn.net/packages-repo.gpg | sudo tee /etc/apt/keyrings/openvpn.asc",
+    "wget -q -O- https://packages.openvpn.net/packages-repo.gpg | sudo tee /etc/apt/keyrings/openvpn.asc",
     "echo deb [signed-by=/etc/apt/keyrings/openvpn.asc] https://packages.openvpn.net/openvpn3/debian jammy main | sudo tee /etc/apt/sources.list.d/openvpn-packages.list",
     "sudo apt-get update",
     "sudo apt-get remove thunderbird -y",
@@ -325,7 +326,7 @@ def install_node():
     if OS_NAME == "Linux":
         if subprocess.call("which node", shell=True) == 0:
             subprocess.check_call(
-                " curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash",
+                "wget -q -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash",
                 shell=True,
             )
             subprocess.check_call("nvm install --lts", shell=True)

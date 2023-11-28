@@ -348,7 +348,10 @@ def linux_commands(commands):
             )
             printer(SUCCESS, command + " successful")
         except subprocess.CalledProcessError as e:
-            printer(CRIT, f"{command} failed with: {e.output}")
+            printer(
+                CRIT,
+                f"'{command}' failed with Code: {e.returncode} message: {e.output}",
+            )
             sys.exit(1)
 
 

@@ -381,8 +381,8 @@ def install_linux_packages(packages):
                     )
                 else:
                     subprocess.check_call(
-                        f"snap install {APP['package_name']} {xstr(APP['options'])}, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True"
-                    )
+                        f"snap install {APP['package_name']} {xstr(APP['options'])}", stdout=subprocess.DEVNULL,
+                        stderr=subprocess.STDOUT, shell=True)
                 printer(SUCCESS, f"{APP['name']} installation successful")
             else:
                 printer(INFO, APP["name"] + " already installed")

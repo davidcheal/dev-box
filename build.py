@@ -388,34 +388,39 @@ def install_linux_packages(packages):
 def linux_configure():
     if OS_NAME != "Linux":
         return
-    if not os.path.exists(os.path.expanduser(f"{HOME}.config/terminator")):
-        os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))
-        shutil.copyfile(
-            "./assets/terminator", f"{HOME}.config/terminator/config/terminator-config"
-        )
-    if not os.path.isfile(os.path.expanduser(f"{HOME}.ssh/known_hosts")):
+    try:
+        if not os.path.exists(os.path.expanduser(f"{HOME}.config/terminator")):
+            os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))
+            shutil.copyfile(
+                "./assets/terminator",
+                f"{HOME}.config/terminator/config/terminator-config",
+            )
+        if not os.path.isfile(os.path.expanduser(f"{HOME}.ssh/known_hosts")):
+            subprocess.check_call(
+                f"ssh-keygen -t rsa -N '' -f {HOME}.ssh/{EMAIL} <<<y",
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+                shell=True,
+            )
+        shutil.copyfile(f"{HOME}.profile", f"{HOME}.profile.old")
+        shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc.old")
+        shutil.copyfile("./assets/profile", f"{HOME}.profile")
+        shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc")
         subprocess.check_call(
-            f"ssh-keygen -t rsa -N '' -f {HOME}.ssh/{EMAIL} <<<y",
+            f"git config --global --replace-all user.email {EMAIL}",
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             shell=True,
         )
-    shutil.copyfile(f"{HOME}.profile", f"{HOME}.profile.old")
-    shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc.old")
-    shutil.copyfile("./assets/profile", f"{HOME}.profile")
-    shutil.copyfile("./assets/bashrc", f"{HOME}.bashrc")
-    subprocess.check_call(
-        f"git config --global --replace-all user.email {EMAIL}",
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-        shell=True,
-    )
-    subprocess.check_call(
-        f"git config --global --replace-all user.name {NAME}",
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-        shell=True,
-    )
+        subprocess.check_call(
+            f"git config --global --replace-all user.name {NAME}",
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+            shell=True,
+        )
+    except subprocess.CalledProcessError as e:
+        printer(CRIT, f"Installation failed {e.output}")
+        sys.exit(1)
 
 
 # Get user input
@@ -425,7 +430,7 @@ NAME = input(f"What is your name?: [{NAME}]") or NAME
 
 create_build_loc()
 linux_commands(LINUX_COMMANDS)
-linux_configure()
 install_chrome()
 install_linux_packages(LINUX_BASE_APPS)
 install_linux_packages(LINUX_DEV_APPS)
+linux_configure()

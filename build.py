@@ -331,16 +331,21 @@ def install_chrome():
 def install_node():
     if OS_NAME == "Linux":
         if subprocess.call("which node", shell=True) == 0:
-            subprocess.check_call(
-                "wget -q -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash",
-                shell=True,
-            )
-            subprocess.check_call("nvm install --lts", shell=True)
-            subprocess.check_call(
-                "npm install -g npm-check-updates vite express-generator",
-                shell=True,
-            )
-            printer(SUCCESS, "Node installation successful. Reboot before sue")
+            try:
+                subprocess.check_call(
+                    "wget -q -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash",
+                    shell=True,
+                )
+                subprocess.check_call("nvm install --lts", shell=True)
+                subprocess.check_call(
+                    "npm install -g npm-check-updates vite express-generator",
+                    shell=True,
+                )
+                printer(SUCCESS, "Node installation successful. Reboot before sue")
+            except subprocess.CalledProcessError as e:
+                printer(CRIT, f"Node installation failed with: {e.output}")
+                sys.exit(1)
+
         else:
             printer(INFO, "Node Already installed")
 
@@ -381,7 +386,7 @@ def install_linux_packages(packages):
                     )
                 else:
                     subprocess.check_call(
-                        f"snap install {APP['package_name']} {xstr(APP['options'])}",
+                        f"sudo snap install {APP['package_name']} {xstr(APP['options'])}",
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT,
                         shell=True,

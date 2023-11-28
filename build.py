@@ -12,13 +12,20 @@ SUCCESS = "\033[32m"
 WARN = "\033[33m"
 RESET = "\033[0m"
 INFO = "\033[37m"
-
-OS_NAME = platform.system()
+OS_NAME = "unknown"
 
 
 def printer(color, text):
     print(f"{color}{text}{RESET}")
 
+
+if "Linux" in platform.system():
+    OS_NAME = "Linux"
+elif "Darwin" in platform.system():
+    OS_NAME = "Mac"
+else:
+    printer(CRIT, f"{OS_NAME} doesn't match any OS this script can help with.")
+    sys.exit(1)
 
 # Defaults
 EMAIL = "david.cheal@gmail.com"  # default
@@ -289,16 +296,9 @@ DMI_CODE = subprocess.check_output("sudo dmidecode -s system-manufacturer", shel
 
 if re.match("VMware", str(DMI_CODE, encoding="utf-8")):
     VMWARE = True
+
+
 # Detect Ubuntu or MacOs
-if "Linux" in platform.system().lower():
-    OS_NAME = "Linux"
-    TMP = "/tmp/build"
-elif "darwin" in platform.system().lower():
-    OS_NAME = "macos"
-    TMP = "/tmp/build"
-else:
-    printer(CRIT, "OS_NAME doesn't match anything this script can help with.")
-    sys.exit(1)
 
 
 def install_chrome():

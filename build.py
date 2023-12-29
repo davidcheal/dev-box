@@ -296,6 +296,13 @@ LINUX_DEV_APPS = [
         "installer": "snap",
         "which": "code",
     },
+        {
+        "name": "PyCharm",
+        "package_name": "pycharm-community",
+        "options": "--classic",
+        "installer": "snap",
+        "which": "pycharm-community",
+    },
 ]
 
 # Detect VMWARE
@@ -311,11 +318,11 @@ if re.match("VMware", str(DMI_CODE, encoding="utf-8")):
 def install_chrome():
     if OS_NAME == "Linux":
         if (
-                subprocess.call(
-                    "which chrome",
-                    shell=True,
-                )
-                == 1
+            subprocess.call(
+                "which chrome",
+                shell=True,
+            )
+            == 1
         ):
             return
         subprocess.check_call(

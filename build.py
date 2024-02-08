@@ -160,6 +160,20 @@ LINUX_BASE_APPS = [
         "installer": "apt",
         "which": "pip",
     },
+        {
+        "name": "Qbittorrent",
+        "package_name": "libegl1-mesa",
+        "options": None,
+        "installer": "apt",
+        "which": "libegl1-mesa",
+    },
+        {
+        "name": "libgl1-mesa-glx",
+        "package_name": "libgl1-mesa-glx",
+        "options": None,
+        "installer": "apt",
+        "which": "libgl1-mesa-glx",
+    },
     {
         "name": "Qbittorrent",
         "package_name": "qbittorrent",
@@ -413,7 +427,7 @@ def linux_configure():
         if not os.path.exists(os.path.expanduser(f"{HOME}.config/terminator")):
             os.mkdir(os.path.expanduser(f"{HOME}.config/terminator"))
             shutil.copyfile(
-                "./assets/terminator",
+                "assets/terminator",
                 f"{HOME}.config/terminator/config/terminator-config",
             )
         if not os.path.isfile(os.path.expanduser(f"{HOME}.ssh/known_hosts")):
